@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Usuarios</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { margin: 4px; }
+        .result { margin-top: 12px; white-space: pre-wrap; background:#f0f0f0; padding:8px; }
+    </style>
+</head>
+<body>
+    <h1>Interfaz simple de Usuarios</h1>
+
+    <button id="btnAll">Listar todos</button>
+    <div>
+        <input placeholder="ID" id="inputId" type="number">
+        <button id="btnById">Buscar por ID</button>
+    </div>
+    <h2>Crear / actualizar</h2>
+    <div>
+        <input id="formId" placeholder="ID (solo actualizar)" type="number">
+        <input id="formNombre" placeholder="Nombre">
+        <input id="formApellido" placeholder="Apellido">
+        <input id="formEmail" placeholder="Email">
+        <button id="btnSave">Guardar</button>
+    </div>
+    <h2>Eliminar</h2>
+    <div>
+        <input placeholder="ID" id="inputDeleteId" type="number">
+        <button id="btnDelete">Eliminar</button>
+    </div>
+
+    <div class="result" id="output"></div>
+
+    <script>
+        const api = '/usuarios';
+        const output = document.getElementById('output');
+        function show(data){ output.textContent = JSON.stringify(data, null, 2); }
+
+        document.getElementById('btnAll').onclick = async () => {
+            const res = await fetch(api);
+            show(await res.json());
+        };
+        document.getElementById('btnById').onclick = async () => {
+            const id = document.getElementById('inputId').value;
+            const res = await fetch(`${api}/id/${id}`);
+            show(await res.json());
+        };
+        document.getElementById('btnSave').onclick = async () => {
+            const id = document.getElementById('formId').value;
+            const user = {
+                nombre: document.getElementById('formNombre').value,
+                apellido: document.getElementById('formApellido').value,
+                email: document.getElementById('formEmail').value,
+            };
+            let res;
+            if(id){
+                res = await fetch(`${api}/id/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(user)
+                });
+            } else {
+                res = await fetch(api, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(user)
+                });
+            }
+            show(await res.json());
+        };
+        document.getElementById('btnDelete').onclick = async () => {
+            const id = document.getElementById('inputDeleteId').value;
+            const res = await fetch(`${api}/id/${id}`, { method: 'DELETE' });
+            show(await res.json());
+        };
+    </script>
+</body>
+</html>
