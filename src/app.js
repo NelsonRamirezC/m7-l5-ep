@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
-import usuariosRotes from './routes/Usuarios.routes.js'
+import usuariosRoutes from './routes/Usuarios.routes.js';
+import morgan from 'morgan';
 
 const app = express();
 
@@ -9,11 +10,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+app.use(morgan('dev'));
+
 // public directory estática
 app.use(express.static(path.resolve("public")));
-
 // RUTAS API
-app.use("/usuarios", usuariosRotes);
+app.use("/usuarios", usuariosRoutes);
 
 // ruta para renderizar front (opcional, sirve si no se usa index estático)
 app.get('/', (req, res) => {

@@ -1,11 +1,26 @@
 import Usuario from "../models/Usuario.model.js";
 import Direccion from "../models/Direccion.model.js";
+import Perfil from "../models/Perfil.model.js";
 
 export const getAll = async (req, res) => {
     try {
         let usuarios = await Usuario.findAll({
-            include: Direccion,
+            include: [
+                {
+                    model: Perfil,
+                    attributes: {
+                        exclude: ["id_usuario"]
+                    }
+                },
+                {
+                    model: Direccion,
+                    attributes: {
+                        exclude: ["id_usuario"]
+                    }
+                }
+            ],
         });
+
         res.json({ usuarios, message: "Ok" });
     } catch (error) {
         res.status(500).json({
