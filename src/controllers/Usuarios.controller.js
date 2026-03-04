@@ -9,15 +9,15 @@ export const getAll = async (req, res) => {
                 {
                     model: Perfil,
                     attributes: {
-                        exclude: ["id_usuario"]
-                    }
+                        exclude: ["id_usuario"],
+                    },
                 },
                 {
                     model: Direccion,
                     attributes: {
-                        exclude: ["id_usuario"]
-                    }
-                }
+                        exclude: ["id_usuario"],
+                    },
+                },
             ],
         });
 
@@ -39,6 +39,12 @@ export const getFindByPk = async (req, res) => {
                 attributes: {
                     exclude: ["id_usuario"],
                 },
+                include: {
+                    model: Perfil,
+                    attributes: {
+                        exclude: ["id_usuario"],
+                    },
+                },
             },
         });
 
@@ -53,10 +59,53 @@ export const getFindByPk = async (req, res) => {
 // CREAR NUEVO USUARIO
 export const createUsuario = async (req, res) => {
     try {
-        const { nombre, apellido, email } = req.body;
-        const newUser = await Usuario.create({ nombre, apellido, email });
+        const {
+            nombre,
+            apellido,
+            email,
+            calle,
+            numero,
+            comuna,
+            ciudad,
+            nombreUsuario,
+            biografia,
+            preferencias,
+        } = req.body;
+
+        let newUser = await Usuario.create(
+            {
+                nombre,
+                apellido,
+                email,
+                direccion: {
+                    calle,
+                    numero,
+                    comuna,
+                    ciudad,
+                },
+                perfil: {
+                    nombreUsuario,
+                    biografia,
+                    preferencias,
+                },
+            },
+            {
+                include: [
+                    {
+                        model: Direccion,
+                        as: "direccion",
+                    },
+                    {
+                        model: Perfil,
+                        as: "perfil",
+                    },
+                ],
+            },
+        );
+
         res.status(201).json({ usuario: newUser, message: "Usuario creado" });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             error: "Error al intentar crear el usuario...",
         });

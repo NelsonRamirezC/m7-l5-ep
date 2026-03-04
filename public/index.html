@@ -19,10 +19,33 @@
     </div>
     <h2>Crear / actualizar</h2>
     <div>
+        <h3>Datos Personales</h3>
         <input id="formId" placeholder="ID (solo actualizar)" type="number">
         <input id="formNombre" placeholder="Nombre">
         <input id="formApellido" placeholder="Apellido">
         <input id="formEmail" placeholder="Email">
+        
+        <h3>Perfil</h3>
+        <input id="formNombreUsuario" placeholder="Nombre de usuario">
+        <input id="formBiografia" placeholder="Biografía">
+        <h4>Lenguajes de programación preferidos:</h4>
+        <label><input type="checkbox" name="preferencias" value="JavaScript"> JavaScript</label>
+        <label><input type="checkbox" name="preferencias" value="Python"> Python</label>
+        <label><input type="checkbox" name="preferencias" value="Java"> Java</label>
+        <label><input type="checkbox" name="preferencias" value="C++"> C++</label>
+        <label><input type="checkbox" name="preferencias" value="C#"> C#</label>
+        <label><input type="checkbox" name="preferencias" value="PHP"> PHP</label>
+        <label><input type="checkbox" name="preferencias" value="Ruby"> Ruby</label>
+        <label><input type="checkbox" name="preferencias" value="Go"> Go</label>
+        <label><input type="checkbox" name="preferencias" value="Rust"> Rust</label>
+        <label><input type="checkbox" name="preferencias" value="TypeScript"> TypeScript</label>
+        
+        <h3>Dirección</h3>
+        <input id="formCalle" placeholder="Calle">
+        <input id="formNumero" placeholder="Número" type="number">
+        <input id="formComuna" placeholder="Comuna">
+        <input id="formCiudad" placeholder="Ciudad">
+        
         <button id="btnSave">Guardar</button>
     </div>
     <h2>Eliminar</h2>
@@ -53,6 +76,13 @@
                 nombre: document.getElementById('formNombre').value,
                 apellido: document.getElementById('formApellido').value,
                 email: document.getElementById('formEmail').value,
+                nombreUsuario: document.getElementById('formNombreUsuario').value,
+                biografia: document.getElementById('formBiografia').value,
+                preferencias: Array.from(document.querySelectorAll('input[name="preferencias"]:checked')).map(cb => cb.value),
+                calle: document.getElementById('formCalle').value,
+                numero: parseInt(document.getElementById('formNumero').value) || 0,
+                comuna: document.getElementById('formComuna').value,
+                ciudad: document.getElementById('formCiudad').value,
             };
             let res;
             if(id){
