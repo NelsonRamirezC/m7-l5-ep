@@ -1,6 +1,7 @@
 import Usuario from "../models/Usuario.model.js";
 import Direccion from "../models/Direccion.model.js";
 import Perfil from "../models/Perfil.model.js";
+import db from "../config/db.js";
 
 export const getAll = async (req, res) => {
     try {
@@ -8,12 +9,14 @@ export const getAll = async (req, res) => {
             include: [
                 {
                     model: Perfil,
+                    as: "perfil",
                     attributes: {
                         exclude: ["id_usuario"],
                     },
                 },
                 {
                     model: Direccion,
+                    as: "direccion",
                     attributes: {
                         exclude: ["id_usuario"],
                     },
@@ -58,7 +61,9 @@ export const getFindByPk = async (req, res) => {
 
 // CREAR NUEVO USUARIO
 export const createUsuario = async (req, res) => {
+    const t = await db.transaction();
     try {
+
         const {
             nombre,
             apellido,
@@ -101,11 +106,14 @@ export const createUsuario = async (req, res) => {
                     },
                 ],
             },
+            { transaction: t },
         );
 
+        await t.commit();
         res.status(201).json({ usuario: newUser, message: "Usuario creado" });
     } catch (error) {
         console.log(error);
+        await t.rollback();
         res.status(500).json({
             error: "Error al intentar crear el usuario...",
         });

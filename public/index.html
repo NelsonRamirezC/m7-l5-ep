@@ -2,74 +2,480 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRUD Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        input, button { margin: 4px; }
-        .result { margin-top: 12px; white-space: pre-wrap; background:#f0f0f0; padding:8px; }
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .container-main {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #667eea);
+            color: white;
+            border: none;
+            padding: 1.5rem;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-danger {
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .form-check {
+            padding-left: 0;
+        }
+        
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-top: 0.3em;
+            cursor: pointer;
+            border-radius: 4px;
+            accent-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            user-select: none;
+        }
+        
+        .result-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .result-box:empty::before {
+            content: "Los resultados aparecerán aquí...";
+            color: #94a3b8;
+            font-style: italic;
+        }
+        
+        .badge-custom {
+            background: linear-gradient(135deg, var(--primary-color), #667eea);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        
+        .view {
+            display: none;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #cbd5e1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #94a3b8;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+        
+        .success-message {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Interfaz simple de Usuarios</h1>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-people-fill"></i> Gestión de Usuarios</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link view-link active" href="#" onclick="showView('listar'); return false;">
+                            <i class="bi bi-list-ul"></i> Listar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link view-link" href="#" onclick="showView('crear'); return false;">
+                            <i class="bi bi-plus-circle"></i> Crear
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link view-link" href="#" onclick="showView('buscar'); return false;">
+                            <i class="bi bi-search"></i> Buscar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <button id="btnAll">Listar todos</button>
-    <div>
-        <input placeholder="ID" id="inputId" type="number">
-        <button id="btnById">Buscar por ID</button>
-    </div>
-    <h2>Crear / actualizar</h2>
-    <div>
-        <h3>Datos Personales</h3>
-        <input id="formId" placeholder="ID (solo actualizar)" type="number">
-        <input id="formNombre" placeholder="Nombre">
-        <input id="formApellido" placeholder="Apellido">
-        <input id="formEmail" placeholder="Email">
-        
-        <h3>Perfil</h3>
-        <input id="formNombreUsuario" placeholder="Nombre de usuario">
-        <input id="formBiografia" placeholder="Biografía">
-        <h4>Lenguajes de programación preferidos:</h4>
-        <label><input type="checkbox" name="preferencias" value="JavaScript"> JavaScript</label>
-        <label><input type="checkbox" name="preferencias" value="Python"> Python</label>
-        <label><input type="checkbox" name="preferencias" value="Java"> Java</label>
-        <label><input type="checkbox" name="preferencias" value="C++"> C++</label>
-        <label><input type="checkbox" name="preferencias" value="C#"> C#</label>
-        <label><input type="checkbox" name="preferencias" value="PHP"> PHP</label>
-        <label><input type="checkbox" name="preferencias" value="Ruby"> Ruby</label>
-        <label><input type="checkbox" name="preferencias" value="Go"> Go</label>
-        <label><input type="checkbox" name="preferencias" value="Rust"> Rust</label>
-        <label><input type="checkbox" name="preferencias" value="TypeScript"> TypeScript</label>
-        
-        <h3>Dirección</h3>
-        <input id="formCalle" placeholder="Calle">
-        <input id="formNumero" placeholder="Número" type="number">
-        <input id="formComuna" placeholder="Comuna">
-        <input id="formCiudad" placeholder="Ciudad">
-        
-        <button id="btnSave">Guardar</button>
-    </div>
-    <h2>Eliminar</h2>
-    <div>
-        <input placeholder="ID" id="inputDeleteId" type="number">
-        <button id="btnDelete">Eliminar</button>
+    <div class="container container-main">
+        <!-- Vista: Listar -->
+        <div id="listar" class="view active">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-list-ul"></i> Todos los Usuarios</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-3" id="btnAll">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar Lista
+                    </button>
+                    <div class="result-box" id="output"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista: Crear/Actualizar -->
+        <div id="crear" class="view">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-plus-circle"></i> Crear / Actualizar Usuario</h5>
+                </div>
+                <div class="card-body">
+                    <form id="usuarioForm">
+                        <!-- Datos Personales -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="bi bi-person-fill"></i> Datos Personales
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">ID (solo para actualizar)</label>
+                                    <input type="number" class="form-control" id="formId" placeholder="Ingrese el ID">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="formNombre" placeholder="Juan" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Apellido *</label>
+                                    <input type="text" class="form-control" id="formApellido" placeholder="Pérez" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="formEmail" placeholder="juan@example.com" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perfil -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="bi bi-person-badge"></i> Perfil
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de usuario *</label>
+                                <input type="text" class="form-control" id="formNombreUsuario" placeholder="juanperez123" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Biografía</label>
+                                <textarea class="form-control" id="formBiografia" placeholder="Cuéntanos sobre ti..." rows="3"></textarea>
+                            </div>
+                            <label class="form-label">Lenguajes de programación preferidos *</label>
+                            <div class="checkbox-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="JavaScript" id="pref1">
+                                    <label class="form-check-label" for="pref1">JavaScript</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="Python" id="pref2">
+                                    <label class="form-check-label" for="pref2">Python</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="Java" id="pref3">
+                                    <label class="form-check-label" for="pref3">Java</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="C++" id="pref4">
+                                    <label class="form-check-label" for="pref4">C++</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="C#" id="pref5">
+                                    <label class="form-check-label" for="pref5">C#</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="PHP" id="pref6">
+                                    <label class="form-check-label" for="pref6">PHP</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="Ruby" id="pref7">
+                                    <label class="form-check-label" for="pref7">Ruby</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="Go" id="pref8">
+                                    <label class="form-check-label" for="pref8">Go</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="Rust" id="pref9">
+                                    <label class="form-check-label" for="pref9">Rust</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="preferencias" value="TypeScript" id="pref10">
+                                    <label class="form-check-label" for="pref10">TypeScript</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="bi bi-house-fill"></i> Dirección
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Calle *</label>
+                                    <input type="text" class="form-control" id="formCalle" placeholder="Av. Principal" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Número *</label>
+                                    <input type="number" class="form-control" id="formNumero" placeholder="123" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Comuna *</label>
+                                    <input type="text" class="form-control" id="formComuna" placeholder="Santiago" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" id="formCiudad" placeholder="Santiago" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Limpiar
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnSave">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-3">
+                        <div class="result-box" id="outputForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista: Buscar -->
+        <div id="buscar" class="view">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-search"></i> Buscar por ID</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-box mb-3">
+                                <input type="number" class="form-control" id="inputId" placeholder="Ingrese el ID del usuario">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <button class="btn btn-primary w-100" id="btnById">
+                                <i class="bi bi-zoom-in"></i> Buscar
+                            </button>
+                            <div class="mt-3">
+                                <div class="result-box" id="outputSearch"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-trash-fill"></i> Eliminar Usuario</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-box mb-3">
+                                <input type="number" class="form-control" id="inputDeleteId" placeholder="Ingrese el ID a eliminar">
+                                <i class="bi bi-trash"></i>
+                            </div>
+                            <button class="btn btn-danger w-100" id="btnDelete">
+                                <i class="bi bi-exclamation-triangle"></i> Eliminar
+                            </button>
+                            <div class="mt-3">
+                                <div class="result-box" id="outputDelete"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="result" id="output"></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const api = '/usuarios';
-        const output = document.getElementById('output');
-        function show(data){ output.textContent = JSON.stringify(data, null, 2); }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            document.querySelectorAll('.view-link').forEach(link => link.classList.remove('active'));
+            event.target.closest('.view-link').classList.add('active');
+        }
+
+        function show(data, elementId = 'output') {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
 
         document.getElementById('btnAll').onclick = async () => {
             const res = await fetch(api);
-            show(await res.json());
+            show(await res.json(), 'output');
         };
+
         document.getElementById('btnById').onclick = async () => {
             const id = document.getElementById('inputId').value;
+            if (!id) {
+                alert('Por favor ingrese un ID');
+                return;
+            }
             const res = await fetch(`${api}/id/${id}`);
-            show(await res.json());
+            show(await res.json(), 'outputSearch');
         };
+
         document.getElementById('btnSave').onclick = async () => {
             const id = document.getElementById('formId').value;
             const user = {
@@ -84,26 +490,42 @@
                 comuna: document.getElementById('formComuna').value,
                 ciudad: document.getElementById('formCiudad').value,
             };
+
+            if (!user.nombre || !user.apellido || !user.email || !user.nombreUsuario || !user.calle || !user.ciudad || user.preferencias.length === 0) {
+                alert('Por favor complete todos los campos requeridos');
+                return;
+            }
+
             let res;
-            if(id){
+            if (id) {
                 res = await fetch(`${api}/id/${id}`, {
                     method: 'PUT',
-                    headers: {'Content-Type':'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user)
                 });
             } else {
                 res = await fetch(api, {
                     method: 'POST',
-                    headers: {'Content-Type':'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user)
                 });
             }
-            show(await res.json());
+            show(await res.json(), 'outputForm');
+            if (res.ok) {
+                document.getElementById('usuarioForm').reset();
+            }
         };
+
         document.getElementById('btnDelete').onclick = async () => {
             const id = document.getElementById('inputDeleteId').value;
-            const res = await fetch(`${api}/id/${id}`, { method: 'DELETE' });
-            show(await res.json());
+            if (!id) {
+                alert('Por favor ingrese un ID');
+                return;
+            }
+            if (confirm('¿Está seguro de que desea eliminar este usuario?')) {
+                const res = await fetch(`${api}/id/${id}`, { method: 'DELETE' });
+                show(await res.json(), 'outputDelete');
+            }
         };
     </script>
 </body>

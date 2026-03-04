@@ -17,7 +17,6 @@ Direccion.init(
         comuna: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique:true
         },
         ciudad: {
             type: DataTypes.STRING,
