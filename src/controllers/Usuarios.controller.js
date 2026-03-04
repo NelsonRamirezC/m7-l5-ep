@@ -63,60 +63,32 @@ export const getFindByPk = async (req, res) => {
 export const createUsuario = async (req, res) => {
     const t = await db.transaction();
     try {
-
         const {
-            nombre,
-            apellido,
-            email,
-            calle,
-            numero,
-            comuna,
-            ciudad,
-            nombreUsuario,
-            biografia,
-            preferencias,
+            nombre, apellido, email, calle, numero, comuna, ciudad,
+            nombreUsuario, biografia, preferencias
         } = req.body;
 
-        let newUser = await Usuario.create(
+        const newUser = await Usuario.create(
             {
-                nombre,
-                apellido,
-                email,
-                direccion: {
-                    calle,
-                    numero,
-                    comuna,
-                    ciudad,
-                },
-                perfil: {
-                    nombreUsuario,
-                    biografia,
-                    preferencias,
-                },
+                nombre, apellido, email,
+                direccion: { calle, numero, comuna, ciudad },
+                perfil: { nombreUsuario, biografia, preferencias }
             },
             {
                 include: [
-                    {
-                        model: Direccion,
-                        as: "direccion",
-                    },
-                    {
-                        model: Perfil,
-                        as: "perfil",
-                    },
+                    { model: Direccion, as: "direccion" },
+                    { model: Perfil, as: "perfil" }
                 ],
-            },
-            { transaction: t },
+                transaction: t  // ← Aquí, dentro de opciones
+            }
         );
 
         await t.commit();
-        res.status(201).json({ usuario: newUser, message: "Usuario creado" });
+        res.status(201).json({ usuario: newUser, message: "Usuario creado exitosamente" });
     } catch (error) {
-        console.log(error);
         await t.rollback();
-        res.status(500).json({
-            error: "Error al intentar crear el usuario...",
-        });
+        console.error("Error creando usuario:", error);  // Mejor logging
+        res.status(500).json({ error: "Error al crear usuario" });
     }
 };
 
