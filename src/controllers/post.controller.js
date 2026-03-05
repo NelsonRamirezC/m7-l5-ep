@@ -65,27 +65,35 @@ export const getEtiquetas = async (req, res) => {
 
 
 export const create = async (req, res) => {
+    const t = await db.transaction();
     try {
-
         let {titulo, contenido, etiquetas, id_usuario} = req.body;
 
-        let usuario = await Usuario.findByPk(id_usuario);
-        let post = await Post.create({titulo, contenido});
+        let usuario = await Usuario.findByPk(id_usuario, { transaction: t });
+        
+        if (!usuario) {
+            await t.rollback();
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
 
-        await post.setUsuario(usuario);
+        let post = await Post.create({titulo, contenido}, { transaction: t });
+        await post.setUsuario(usuario, { transaction: t });
 
         for (const etiquetaNombre of etiquetas) {
             // buscar etiqueta existente o crear nueva si no existe
             let [etiqueta] = await Etiqueta.findOrCreate({
                 where: { nombre: etiquetaNombre },
+                transaction: t
             });
 
-            await post.addEtiqueta(etiqueta);
+            await post.addEtiqueta(etiqueta, { transaction: t });
         }
 
+        await t.commit();
         res.status(201).json({post, message: "ok"});        
 
     } catch (error) {
+        await t.rollback();
         console.log(error);
         res.status(500).json({
             error: "Error al intentar procesar los datos...",
