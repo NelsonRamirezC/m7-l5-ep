@@ -24,7 +24,7 @@ Usuario.init(
         // Other model options go here
         sequelize: db, // We need to pass the connection instance
         modelName: "Usuario", // We need to choose the model name,
-        tableName: "Usuarios",
+        tableName: "usuarios",
         timestamps: false,
     },
 );

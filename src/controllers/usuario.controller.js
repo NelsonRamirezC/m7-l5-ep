@@ -60,7 +60,7 @@ export const getFindByPk = async (req, res) => {
 };
 
 // CREAR NUEVO USUARIO
-export const createUsuario = async (req, res) => {
+export const create = async (req, res) => {
     const t = await db.transaction();
     try {
         const {
@@ -93,7 +93,7 @@ export const createUsuario = async (req, res) => {
 };
 
 // ACTUALIZAR USUARIO EXISTENTE
-export const updateUsuario = async (req, res) => {
+export const update = async (req, res) => {
     try {
         const id = req.params.id;
         const { nombre, apellido, email } = req.body;
@@ -113,7 +113,7 @@ export const updateUsuario = async (req, res) => {
 };
 
 // BORRAR USUARIO
-export const deleteUsuario = async (req, res) => {
+export const destroy = async (req, res) => {
     try {
         const id = req.params.id;
         const deleted = await Usuario.destroy({ where: { id } });

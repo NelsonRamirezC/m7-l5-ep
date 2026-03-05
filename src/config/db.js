@@ -10,6 +10,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASSWORD, {
     host: HOST,
     port: PORT,
     dialect: "postgres",
+    quoteIdentifiers: false,
     pool: {
         idle: 10000,
     },

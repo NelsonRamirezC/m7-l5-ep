@@ -22,7 +22,7 @@ Perfil.init(
     {
         sequelize: db,
         modelName: "Perfil",
-        tableName: "Perfiles",
+        tableName: "perfiles",
         timestamps: false,
     },
 );

@@ -8,7 +8,7 @@ const init = async() => {
 
     try {
         //await db.authenticate();
-        await db.sync({force: true, alter: true});
+        await db.sync({force: false, alter: false});
 
         app.listen(3000, () => {
             console.log("Servidor escuchando en http://localhost:3000");

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posts</title>
+    <!-- bootstrap para estilos y navbar -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 2rem;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin: 0.5rem 0;
+        }
+        ul {
+            padding-left: 1.5rem;
+        }
+        .post {
+            border-bottom: 1px solid #ddd;
+            padding: 0.5rem 0;
+        }
+        .etiquetas {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html"><i class="bi bi-house-door"></i> Usuarios</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html"><i class="bi bi-people"></i> Usuarios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="posts.html"><i class="bi bi-file-earmark-text"></i> Posts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <h1>Listado de posts</h1>
+    <div id="posts-container"></div>
+
+    <h2>Crear nuevo post</h2>
+    <form id="post-form">
+        <label>
+            Título:<br />
+            <input type="text" name="titulo" required />
+        </label>
+        <label>
+            Contenido:<br />
+            <textarea name="contenido" rows="4" required></textarea>
+        </label>
+        <label>
+            Usuario ID (por defecto 1):<br />
+            <input type="number" name="id_usuario" value="1" min="1" required />
+        </label>
+        <fieldset>
+            <legend>Etiquetas (seleccione una o más)</legend>
+            <div id="checkbox-list">
+                <!-- Se completará con etiquetas obtenidas del servidor -->
+            </div>
+        </fieldset>
+        <button type="submit">Crear post</button>
+    </form>
+
+    <script>
+        const apiBase = window.location.origin + '/posts';
+
+        async function fetchEtiquetas() {
+            try {
+                const res = await fetch(apiBase + '/etiquetas');
+                if (!res.ok) throw new Error('No se pudieron obtener las etiquetas');
+                const data = await res.json();
+                return data.etiquetas || [];
+            } catch (err) {
+                console.error(err);
+                // en caso de fallo, usar etiquetas fijas
+                return ['Tecnología', 'Cocina', 'Innovación'];
+            }
+        }
+
+        async function loadEtiquetasCheckboxes() {
+            const etiquetas = await fetchEtiquetas();
+            const container = document.getElementById('checkbox-list');
+            container.innerHTML = '';
+            etiquetas.forEach(et => {
+                const label = document.createElement('label');
+                label.innerHTML = `<input type="checkbox" name="etiquetas" value="${et.nombre || et}" /> ${et.nombre || et}`;
+                container.appendChild(label);
+            });
+        }
+
+        async function fetchPosts() {
+            const res = await fetch(apiBase + '/');
+            const data = await res.json();
+            return data.posts || [];
+        }
+
+        function renderPosts(posts) {
+            const container = document.getElementById('posts-container');
+            if (!posts.length) {
+                container.innerHTML = '<p>No hay posts todavía.</p>';
+                return;
+            }
+            container.innerHTML = '';
+            posts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'post';
+                div.innerHTML = `<strong>${p.titulo}</strong><br />
+                    <span class="etiquetas">${(p.etiquetas || []).map(e => e.nombre).join(', ')}</span>
+                    <p>${p.contenido}</p>`;
+                container.appendChild(div);
+            });
+        }
+
+        async function refresh() {
+            const posts = await fetchPosts();
+            renderPosts(posts);
+        }
+
+        document.getElementById('post-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const titulo = formData.get('titulo');
+            const contenido = formData.get('contenido');
+            const id_usuario = formData.get('id_usuario');
+            const etiquetas = [];
+            form.querySelectorAll('input[name="etiquetas"]:checked').forEach(chk => {
+                etiquetas.push(chk.value);
+            });
+
+            const payload = { titulo, contenido, id_usuario, etiquetas };
+
+            try {
+                const res = await fetch(apiBase + '/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (!res.ok) throw new Error('Error creando post');
+                form.reset();
+                await loadEtiquetasCheckboxes();
+                await refresh();
+            } catch (err) {
+                console.error(err);
+                alert('No se pudo crear el post');
+            }
+        });
+
+        // inicializar página
+        loadEtiquetasCheckboxes();
+        refresh();
+    </script>
+    <!-- bootstrap bundle para funcionalidad de navbar -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
